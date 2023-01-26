@@ -1,49 +1,393 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Air Pollution and Purification IoT Dashboard</title>
     <style>
-        *{
-            text-align: center;
-            box-sizing: border-box;
-            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-        }
+      * {
+        text-align: center;
+        box-sizing: border-box;
+        font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+      }
 
-       .frame{
-            border: 5px solid #cccccc;
-            width: 450px;
-            height: 250px;
-            text-align: center;
-        }
-        table{
-            margin-left: auto;
-            margin-right: auto;
-            border-spacing: 20px;
-	}
+      .frame {
+        border: 5px solid #cccccc;
+        width: 450px;
+        height: 250px;
+        text-align: center;
+      }
 
+      table {
+        border-spacing: 20px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .switch {
+        position: relative;
+        display: block;
+        width: 100px;
+        height: 30px;
+        padding: 3px;
+        margin: 0 10px 10px 46%;
+        background: linear-gradient(to bottom, #eeeeee, #ffffff 25px);
+        background-image: -webkit-linear-gradient(top, #eeeeee, #ffffff 25px);
+        border-radius: 18px;
+        box-shadow: inset 0 -1px white, inset 0 1px 1px rgba(0, 0, 0, 0.05);
+        cursor: pointer;
+        box-sizing: content-box;
+      }
+
+      .switch-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        box-sizing: content-box;
+      }
+
+      .switch-label {
+        position: relative;
+        display: block;
+        height: inherit;
+        font-size: 10px;
+        text-transform: uppercase;
+        background: #eceeef;
+        border-radius: inherit;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12),
+          inset 0 0 2px rgba(0, 0, 0, 0.15);
+        box-sizing: content-box;
+      }
+
+      .switch-label:before,
+      .switch-label:after {
+        position: absolute;
+        top: 50%;
+        margin-top: -0.5em;
+        line-height: 1;
+        -webkit-transition: inherit;
+        -moz-transition: inherit;
+        -o-transition: inherit;
+        transition: inherit;
+        box-sizing: content-box;
+      }
+
+      .switch-label:before {
+        content: attr(data-off);
+        right: 11px;
+        color: #aaaaaa;
+        text-shadow: 0 1px rgba(255, 255, 255, 0.5);
+      }
+
+      .switch-label:after {
+        content: attr(data-on);
+        left: 11px;
+        color: #ffffff;
+        text-shadow: 0 1px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+      }
+
+      .switch-input:checked ~ .switch-label {
+        background: #2ed059;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15),
+          inset 0 0 3px rgba(0, 0, 0, 0.2);
+      }
+
+      .switch-input:checked ~ .switch-label:before {
+        opacity: 0;
+      }
+
+      .switch-input:checked ~ .switch-label:after {
+        opacity: 1;
+      }
+
+      .switch-handle {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(to bottom, #ffffff 40%, #f0f0f0);
+        background-image: -webkit-linear-gradient(top, #ffffff 40%, #f0f0f0);
+        border-radius: 100%;
+        box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      .switch-handle:before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin: -6px 0 0 -6px;
+        width: 12px;
+        height: 12px;
+        background: linear-gradient(to bottom, #eeeeee, #ffffff);
+        background-image: -webkit-linear-gradient(top, #eeeeee, #ffffff);
+        border-radius: 6px;
+        box-shadow: inset 0 1px rgba(0, 0, 0, 0.02);
+      }
+
+      .switch-input:checked ~ .switch-handle {
+        left: 74px;
+        box-shadow: -1px 1px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Transition
+      ========================== */
+      .switch-label,
+      .switch-handle {
+        transition: All 0.3s ease;
+        -webkit-transition: All 0.3s ease;
+        -moz-transition: All 0.3s ease;
+        -o-transition: All 0.3s ease;
+      }
+
+      /*Time*/
+      #time {
+        font-weight: bold;
+      }
+      .showTime {
+        text-align: right;
+      }
+
+      /*Dark mode*/
+      .dark-mode {
+        background-color: rgb(15, 14, 14);
+        color: rgb(241, 232, 232);
+      }
+
+      .toggleMode {
+        text-align: left;
+        position: absolute;
+      }
+
+      button {
+        margin: 4px 4px;
+        padding: 6px 9px;
+        cursor: pointer;
+        color: rgb(10, 0, 0);
+        background-color: #f2f7f5;
+        border-radius: 10px;
+      }
+
+      button:hover {
+        background-color: #d5dbd5;
+      }
+
+      button:active {
+        background-color: #e6ece6;
+        box-shadow: 0 5px #666;
+        transform: translateY(4px);
+      }
+
+      /*pop-up message*/
+      .popup {
+        width: 400px;
+        background-color: #fff;
+        border-radius: 10px;
+        position: absolute;
+        border: 2px solid rgba(181, 160, 160, 0.514);
+        top: 0;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.1);
+        text-align: center;
+        padding: 0 30px 30px;
+        color: #333;
+        visibility: hidden;
+        transition: transform 0.4s, top 0.4s;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .open-popup {
+        visibility: visible;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      .popup img {
+        width: 100px;
+        margin-top: -50px;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+      .popup h2 {
+        font-size: 38px;
+        font-weight: 500;
+        margin: 30px 0 10px;
+      }
+      #popup1 button {
+        width: 100%;
+        margin-top: 50px;
+        padding: 10px 0;
+        background-color: #47fa06;
+        color: #fff;
+        border: 0;
+        outline: none;
+        font-size: 18px;
+        border-radius: 4px;
+        cursor: pointer;
+        box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+      }
+      #popup2 button {
+        width: 100%;
+        margin-top: 50px;
+        padding: 10px 0;
+        background-color: #fb0303;
+        color: #fff;
+        border: 0;
+        outline: none;
+        font-size: 18px;
+        border-radius: 4px;
+        cursor: pointer;
+        box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+      }
     </style>
-</head>
-<body>
-    <h1> Air Pollution and Purification IoT Dashboard </h1>
-    <p>
-        Current and Past Data Points
-    </p>
-<p>
-<iframe class = "frame" src="https://thingspeak.com/channels/1970511/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
-<iframe class = "frame" src="https://thingspeak.com/channels/1970511/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
-</p>
-<p>
-<iframe class = "frame" src="https://thingspeak.com/channels/1970511/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+  </head>
+  <body>
+    <div class="toggleMode">
+      <button onclick="toggleMode()">Dark/Light mode</button>
+    </div>
+    <div class="showTime">Date and Time: <span id="time"></span></div>
+    <h1>Air Pollution and Purification IoT Dashboard</h1>
+    <p>Current and Past Data Points</p>
+    <table>
+      <thead>
+        Air Purification Data
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <iframe
+              class="frame"
+              src="https://thingspeak.com/channels/1970511/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"
+            ></iframe>
+          </td>
+          <td>
+            <iframe
+              class="frame"
+              src="https://thingspeak.com/channels/1970511/widgets/569738"
+            ></iframe>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <iframe
+              class="frame"
+              src="https://thingspeak.com/channels/1970511/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"
+            ></iframe>
+          </td>
+          <td>
+            <iframe
+              class="frame"
+              src="https://thingspeak.com/channels/1970511/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"
+            ></iframe>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <iframe
+              class="frame"
+              src="https://thingspeak.com/channels/1970511/charts/5?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"
+            ></iframe>
+          </td>
+          <td>
+            <iframe
+              class="frame"
+              src="https://thingspeak.com/channels/1970511/charts/6?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"
+            ></iframe>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <iframe
+              class="frame"
+              src="https://thingspeak.com/channels/1970511/status/recent"
+            ></iframe>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Switch on/off the air purifier manually:</p>
+    <label class="switch">
+      <input class="switch-input" type="checkbox" />
+      <span
+        class="switch-label"
+        id="button_click"
+        data-on="On"
+        data-off="Off"
+      ></span>
+      <span class="switch-handle"></span>
+    </label>
+    <!-- pop-up message -->
+    <div class="message">
+      <div class="popup" id="popup1">
+        <img
+          src="https://www.nicepng.com/png/full/41-413288_green-power-button-png-strategy-icon-green.png"
+          alt="on symbol"
+        />
+        <h2>ON!!!</h2>
+        <p>The purifier is turned on successfully</p>
+        <button type="button" onclick="closePopupForOn()">OK</button>
+      </div>
+      <div class="popup" id="popup2">
+        <img
+          src="https://uxwing.com/wp-content/themes/uxwing/download/controller-and-music/turn-off-icon.png"
+          alt="off symbol"
+        />
+        <h2>OFF!!!</h2>
+        <p>The purifier is turned off successfully</p>
+        <button type="button" onclick="closePopupForOff()">OK</button>
+      </div>
+    </div>
+  </body>
+  <script>
+    function updateTime() {
+      time.innerHTML = new Date();
+    }
+    setInterval(updateTime, 1000);
 
-</p>
-<p>
-<iframe class = "frame" src="https://thingspeak.com/channels/1970511/charts/5?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
-<iframe class = "frame" src="https://thingspeak.com/channels/1970511/charts/6?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
-</p>
-<iframe class = "frame" src="https://thingspeak.com/channels/1970511/status/recent"></iframe>
+    function toggleMode() {
+      var element = document.body;
+      element.classList.toggle("dark-mode");
+    }
 
-</body>
+    // pop-up message
+    let popup1 = document.getElementById("popup1");
+    function openPopupForOn() {
+      popup1.classList.add("open-popup");
+    }
+    function closePopupForOn() {
+      popup1.classList.remove("open-popup");
+    }
+
+    let popup2 = document.getElementById("popup2");
+    function openPopupForOff() {
+      popup2.classList.add("open-popup");
+    }
+    function closePopupForOff() {
+      popup2.classList.remove("open-popup");
+    }
+
+    let button_click = document.querySelector("#button_click");
+    let countClick = 0;
+    button_click.addEventListener("click", function () {
+      countClick += 1;
+      if (countClick % 2 == 0) {
+        openPopupForOff();
+        window.scrollBy({ top: -1000, behavior: "smooth" });
+        setTimeout(closePopupForOff, 3000);
+      } else {
+        openPopupForOn();
+        window.scrollBy({ top: -1000, behavior: "smooth" });
+        setTimeout(closePopupForOn, 3000);
+      }
+    });
+    let threshold = 50; // set threshold value
+    let num = 100; //AQI value to be taken as input
+
+    if (num > threshold) {
+      openPopupForOn();
+      setTimeout(closePopupForOn, 5000);
+    }
+  </script>
 </html>
